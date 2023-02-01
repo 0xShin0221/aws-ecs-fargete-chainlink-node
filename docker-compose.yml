@@ -1,16 +1,24 @@
 version: "3.8"
 services:
   chainlink:
-    image:  # replace with your ecr image
+    image: ${AWS_ECR_CHAINLINK_IMAGE_URI}
     deploy:
       resources:
         limits:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 1024M
+    # env_file:<- for switching between local and remote
+    #   - environment/.env.dev
     ports:
       - target: 6688
         published: 6688
         protocol: tcp
         x-aws-protocol: http
-    command: 
-      "chainlink local n -p /chainlink/.password -a /chainlink/.api"
+    entrypoint: "/bin/bash -c 'chainlink local n -p /chainlink/.password -a /chainlink/.api'"
+  # external-adapter: <- for runnning with external adapter
+  #   image: ${DEV_AWS_ECR_EXTERNAL_IMAGE_URI}
+  #   entrypoint: "/bin/sh -c 'yarn start'"
+  #   ports:
+  #     - "8080:8080"
+  #   env_file:
+  #     - ../external-adapter/.env
